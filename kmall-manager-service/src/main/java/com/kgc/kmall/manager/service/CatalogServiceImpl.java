@@ -1,10 +1,9 @@
 package com.kgc.kmall.manager.service;
 
-import com.kgc.kmall.bean.PmsBaseCatalog1;
-import com.kgc.kmall.bean.PmsBaseCatalog2;
-import com.kgc.kmall.bean.PmsBaseCatalog2Example;
+import com.kgc.kmall.bean.*;
 import com.kgc.kmall.manager.mapper.PmsBaseCatalog1Mapper;
 import com.kgc.kmall.manager.mapper.PmsBaseCatalog2Mapper;
+import com.kgc.kmall.manager.mapper.PmsBaseCatalog3Mapper;
 import com.kgc.kmall.service.CatalogService;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.stereotype.Component;
@@ -22,6 +21,9 @@ public class CatalogServiceImpl implements CatalogService{
     @Resource
     PmsBaseCatalog2Mapper pmsBaseCatalog2Mapper;
 
+    @Resource
+    PmsBaseCatalog3Mapper pmsBaseCatalog3Mapper;
+
 
     @Override
     public List<PmsBaseCatalog1> getCatalog1() {
@@ -34,5 +36,14 @@ public class CatalogServiceImpl implements CatalogService{
         PmsBaseCatalog2Example example=new PmsBaseCatalog2Example();
         example.createCriteria().andCatalog1IdEqualTo(catalog1Id);
         return pmsBaseCatalog2Mapper.selectByExample(example);
+    }
+
+    @Override
+    public List<PmsBaseCatalog3> getCatalog3(Long catalog2Id) {
+        PmsBaseCatalog3Example example=new PmsBaseCatalog3Example();
+        PmsBaseCatalog3Example.Criteria criteria = example.createCriteria();
+        criteria.andCatalog2IdEqualTo(catalog2Id);
+        List<PmsBaseCatalog3> catalog3List = pmsBaseCatalog3Mapper.selectByExample(example);
+        return catalog3List;
     }
 }
