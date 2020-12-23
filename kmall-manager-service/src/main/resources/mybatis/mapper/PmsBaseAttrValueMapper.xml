@@ -15,6 +15,7 @@
     <result column="attr_id" property="attrId" jdbcType="BIGINT" />
     <result column="is_enabled" property="isEnabled" jdbcType="VARCHAR" />
   </resultMap>
+
   <sql id="Example_Where_Clause" >
     <where >
       <foreach collection="oredCriteria" item="criteria" separator="or" >

@@ -18,12 +18,20 @@ public class AttrServiceImpl implements AttrService{
     PmsBaseAttrInfoMapper pmsBaseAttrInfoMapper;
     @Resource
     PmsBaseAttrValueMapper pmsBaseAttrValueMapper;
+
     @Override
     public List<PmsBaseAttrInfo> select(Long catalog3Id) {
         PmsBaseAttrInfoExample example=new PmsBaseAttrInfoExample();
         PmsBaseAttrInfoExample.Criteria criteria = example.createCriteria();
         criteria.andCatalog3IdEqualTo(catalog3Id);
         List<PmsBaseAttrInfo> infoList = pmsBaseAttrInfoMapper.selectByExample(example);
+        //为每个平台属性添加平台属性值
+        for (PmsBaseAttrInfo pmsBaseAttrInfo : infoList) {
+            PmsBaseAttrValueExample valueExample=new PmsBaseAttrValueExample();
+            valueExample.createCriteria().andAttrIdEqualTo(pmsBaseAttrInfo.getId());
+            List<PmsBaseAttrValue> pmsBaseAttrValueList = pmsBaseAttrValueMapper.selectByExample(valueExample);
+            pmsBaseAttrInfo.setAttrValueList(pmsBaseAttrValueList);
+        }
         return infoList;
     }
 

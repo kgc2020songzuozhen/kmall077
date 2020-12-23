@@ -1,8 +1,7 @@
 package com.kgc.kmall.manager.service;
 
-import com.kgc.kmall.bean.PmsProductInfo;
-import com.kgc.kmall.bean.PmsProductInfoExample;
-import com.kgc.kmall.manager.mapper.PmsProductInfoMapper;
+import com.kgc.kmall.bean.*;
+import com.kgc.kmall.manager.mapper.*;
 import com.kgc.kmall.service.SpuService;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.stereotype.Component;
@@ -16,6 +15,16 @@ public class SpuServiceImpl implements SpuService {
 
     @Resource
     PmsProductInfoMapper pmsProductInfoMapper;
+    @Resource
+    PmsBaseSaleAttrMapper pmsBaseSaleAttrMapper;
+    @Resource
+    PmsProductImageMapper pmsProductImageMapper;
+    @Resource
+    PmsProductSaleAttrMapper pmsProductSaleAttrMapper;
+    @Resource
+    PmsProductSaleAttrValueMapper pmsProductSaleAttrValueMapper;
+
+
 
     @Override
     public List<PmsProductInfo> spuList(Long catalog3Id) {
@@ -24,5 +33,47 @@ public class SpuServiceImpl implements SpuService {
         criteria.andCatalog3IdEqualTo(catalog3Id);
         List<PmsProductInfo> infoList = pmsProductInfoMapper.selectByExample(example);
         return infoList;
+    }
+
+    @Override
+    public List<PmsBaseSaleAttr> baseSaleAttrList() {
+        List<PmsBaseSaleAttr> saleAttrList = pmsBaseSaleAttrMapper.selectByExample(null);
+        return saleAttrList;
+    }
+
+    @Override
+    public Integer saveSpuInfo(PmsProductInfo pmsProductInfo) {
+        try {
+            //添加spu
+            pmsProductInfoMapper.insert(pmsProductInfo);
+            //添加图片
+            List<PmsProductImage> spuImageList = pmsProductInfo.getSpuImageList();
+            if (spuImageList!=null&&spuImageList.size()>0){
+                for (PmsProductImage pmsProductImage : spuImageList) {
+                    pmsProductImage.setProductId(pmsProductInfo.getId());
+                    pmsProductImageMapper.insert(pmsProductImage);
+                }
+            }
+            //添加销售属性
+            List<PmsProductSaleAttr> spuSaleAttrList = pmsProductInfo.getSpuSaleAttrList();
+            if (spuSaleAttrList!=null&&spuSaleAttrList.size()>0){
+                for (PmsProductSaleAttr pmsProductSaleAttr : spuSaleAttrList) {
+                    pmsProductSaleAttr.setProductId(pmsProductInfo.getId());
+                    List<PmsProductSaleAttrValue> spuSaleAttrValueList = pmsProductSaleAttr.getSpuSaleAttrValueList();
+                    if (spuSaleAttrValueList!=null&&spuSaleAttrValueList.size()>0){
+                        for (PmsProductSaleAttrValue pmsProductSaleAttrValue : spuSaleAttrValueList) {
+                            pmsProductSaleAttrValue.setProductId(pmsProductInfo.getId());
+                            //添加销售属性值
+                            pmsProductSaleAttrValueMapper.insert(pmsProductSaleAttrValue);
+                        }
+                    }
+                    pmsProductSaleAttrMapper.insert(pmsProductSaleAttr);
+                }
+            }
+           return 1;
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return 0;
+        }
     }
 }
