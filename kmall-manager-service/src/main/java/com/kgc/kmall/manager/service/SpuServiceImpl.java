@@ -76,4 +76,31 @@ public class SpuServiceImpl implements SpuService {
             return 0;
         }
     }
+
+    @Override
+    public List<PmsProductSaleAttr> spuSaleAttrList(Long spuId) {
+        PmsProductSaleAttrExample example=new PmsProductSaleAttrExample();
+        PmsProductSaleAttrExample.Criteria criteria = example.createCriteria();
+        criteria.andProductIdEqualTo(spuId);
+        List<PmsProductSaleAttr> pmsProductSaleAttrList = pmsProductSaleAttrMapper.selectByExample(example);
+        for (PmsProductSaleAttr pmsProductSaleAttr : pmsProductSaleAttrList) {
+            PmsProductSaleAttrValueExample example1=new PmsProductSaleAttrValueExample();
+            PmsProductSaleAttrValueExample.Criteria criteria1 = example1.createCriteria();
+            criteria1.andSaleAttrIdEqualTo(pmsProductSaleAttr.getSaleAttrId());
+            criteria1.andProductIdEqualTo(spuId);
+
+            List<PmsProductSaleAttrValue> pmsProductSaleAttrValueList = pmsProductSaleAttrValueMapper.selectByExample(example1);
+            pmsProductSaleAttr.setSpuSaleAttrValueList(pmsProductSaleAttrValueList);
+        }
+        return pmsProductSaleAttrList;
+    }
+
+    @Override
+    public List<PmsProductImage> spuImageList(Long spuId) {
+        PmsProductImageExample example=new PmsProductImageExample();
+        PmsProductImageExample.Criteria criteria = example.createCriteria();
+        criteria.andProductIdEqualTo(spuId);
+        List<PmsProductImage> pmsProductImageList = pmsProductImageMapper.selectByExample(example);
+        return pmsProductImageList;
+    }
 }
