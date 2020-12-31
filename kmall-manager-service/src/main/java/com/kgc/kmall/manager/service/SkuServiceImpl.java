@@ -1,5 +1,6 @@
 package com.kgc.kmall.manager.service;
 
+import com.alibaba.fastjson.JSON;
 import com.kgc.kmall.bean.PmsSkuAttrValue;
 import com.kgc.kmall.bean.PmsSkuImage;
 import com.kgc.kmall.bean.PmsSkuInfo;
@@ -8,9 +9,11 @@ import com.kgc.kmall.manager.mapper.PmsSkuAttrValueMapper;
 import com.kgc.kmall.manager.mapper.PmsSkuImageMapper;
 import com.kgc.kmall.manager.mapper.PmsSkuInfoMapper;
 import com.kgc.kmall.manager.mapper.PmsSkuSaleAttrValueMapper;
+import com.kgc.kmall.manager.utils.RedisUtil;
 import com.kgc.kmall.service.SkuService;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.stereotype.Component;
+import redis.clients.jedis.Jedis;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -27,6 +30,9 @@ public class SkuServiceImpl implements SkuService {
     PmsSkuAttrValueMapper pmsSkuAttrValueMapper;
     @Resource
     PmsSkuSaleAttrValueMapper pmsSkuSaleAttrValueMapper;
+
+    @Resource
+    RedisUtil redisUtil;
 
 
     @Override
@@ -58,7 +64,20 @@ public class SkuServiceImpl implements SkuService {
 
     @Override
     public PmsSkuInfo selectBySkuId(Long skuId) {
-        return pmsSkuInfoMapper.selectByPrimaryKey(skuId);
+        Jedis jedis=redisUtil.getJedis();
+        String key="sku:"+skuId+":info";
+        String skuJson = jedis.get(key);
+        if (skuJson!=null){
+            //缓存中有数据
+            PmsSkuInfo pmsSkuInfo = JSON.parseObject(skuJson, PmsSkuInfo.class);
+            return pmsSkuInfo;
+        }else{
+            //缓存中没有数据，从数据库中查询，并写入redis
+            PmsSkuInfo pmsSkuInfo = pmsSkuInfoMapper.selectByPrimaryKey(skuId);
+            String json = JSON.toJSONString(pmsSkuInfo);
+            jedis.set(key,json);
+            return pmsSkuInfo;
+        }
     }
 
     @Override
