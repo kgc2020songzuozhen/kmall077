@@ -1,8 +1,7 @@
-package com.kgc.kmall.manager.config;
+package com.kgc.kmall.config;
 
-import com.kgc.kmall.manager.utils.RedisUtil;
+import com.kgc.kmall.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

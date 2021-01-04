@@ -1,6 +1,5 @@
-package com.kgc.kmall.manager.utils;
+package com.kgc.kmall.utils;
 
-import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
